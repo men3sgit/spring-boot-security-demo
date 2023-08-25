@@ -41,7 +41,7 @@ public class JwtServiceImpl implements JwtService {
         return Jwts.builder()
                 .setClaims(extractClaims)
                 .setSubject(userDetails.getUsername())
-                .setIssuer(LocalDateTime.now().toString())
+                .setIssuer(new Date().toString())
                 .setExpiration(calculateExpirationDate())
                 .signWith(getSignInKey())
                 .compact();
@@ -53,7 +53,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private Date calculateExpirationDate() {
-        final int expirationHours = 24;
+        final int expirationHours = 1;
         // Get the current date and time
         Calendar calendar = Calendar.getInstance();
         // Add expirationHours to the current date and time
