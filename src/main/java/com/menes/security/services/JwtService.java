@@ -18,4 +18,5 @@ public  interface JwtService {
     String generateToken(UserDetails userDetails);
 
     <T> T extractClaims(String token, Function<Claims, T> claimResolver);
+
 }

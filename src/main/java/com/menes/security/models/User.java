@@ -42,8 +42,7 @@ public class User implements UserDetails {
     private String lastName;
     @Column(
             unique = true,
-            nullable = false,
-            length = 50
+            nullable = false
     )
     private String email;
     @Column(

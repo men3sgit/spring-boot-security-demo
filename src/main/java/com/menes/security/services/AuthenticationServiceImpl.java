@@ -1,11 +1,13 @@
 package com.menes.security.services;
 
+import com.menes.security.exceptions.ApiRequestException;
 import com.menes.security.models.Role;
 import com.menes.security.models.User;
 import com.menes.security.repositories.UserRepository;
 import com.menes.security.requests.AuthenticationRequest;
 import com.menes.security.requests.RegisterRequest;
 import com.menes.security.responses.AuthenticationResponse;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,6 +26,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public AuthenticationResponse register(RegisterRequest request) {
+        System.out.println("Im first");
+
+        if(userRepository.findUserByEmail(request.getEmail()).isPresent()){
+            throw new ApiRequestException("Email taken");
+        }
+
         User user = User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
@@ -31,11 +39,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
                 .build();
-        try{
             userRepository.save(user);
-        }catch(RuntimeException exception){
-            throw new IllegalStateException("email exists");
-        }
 
         String jwt = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
@@ -46,16 +50,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
-        User user = userRepository.findUserByEmail(request.getEmail()).orElseThrow(()-> new IllegalStateException("Email not found!"));
+
+        User user = userRepository.findUserByEmail(request.getEmail()).orElseThrow(()-> new ApiRequestException("Email not found!"));
         String jwt = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
                 .token(jwt)
                 .build();
+    }
+
+    @Override
+    public String logout(String token) {
+        return "access token expired!!";
     }
 
 }

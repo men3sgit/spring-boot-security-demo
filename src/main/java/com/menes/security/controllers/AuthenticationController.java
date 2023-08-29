@@ -1,10 +1,12 @@
 package com.menes.security.controllers;
 
+import com.menes.security.exceptions.ApiRequestException;
 import com.menes.security.requests.AuthenticationRequest;
 import com.menes.security.requests.RegisterRequest;
 import com.menes.security.responses.AuthenticationResponse;
 import com.menes.security.services.AuthenticationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,17 +22,19 @@ public class AuthenticationController {
 
     @PostMapping(value = "/register")
     public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) {
-        try {
-            return ResponseEntity.ok(service.register(request));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
-
+        return new ResponseEntity<>(service.register(request), HttpStatus.CREATED);
     }
 
-    @PostMapping(value = "/authenticate")
-    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
+    @PostMapping(value = "/login")
+    public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest request) {
         return ResponseEntity.ok(service.authenticate(request));
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken) {
+        String token = bearerToken.split(" ")[1];
+        return ResponseEntity.ok(service.logout(token));
+    }
+
 
 }

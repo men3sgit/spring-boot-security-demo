@@ -9,4 +9,6 @@ import java.util.Optional;
 public interface AuthenticationService {
     AuthenticationResponse register(RegisterRequest request);
     AuthenticationResponse authenticate(AuthenticationRequest request);
+
+    String logout(String token);
 }
