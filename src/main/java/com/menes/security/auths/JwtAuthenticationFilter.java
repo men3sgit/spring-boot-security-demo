@@ -1,6 +1,7 @@
 package com.menes.security.auths;
 
 import com.menes.security.services.JwtService;
+import com.menes.security.ultis.Key;
 import jakarta.security.auth.message.callback.SecretKeyCallback;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -33,7 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-        final String authHeader = request.getHeader("Authorization");
+        final String authHeader = request.getHeader(Key.KEY_AUTHORIZATION);
         final String jwt;
         final String userEmail;
         if (authHeader == null || !authHeader.startsWith(BEARER_KEY)) {

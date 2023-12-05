@@ -1,5 +1,6 @@
 package com.menes.security.requests;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,4 +13,5 @@ import lombok.NoArgsConstructor;
 public class AuthenticationRequest {
     private String email;
     private String password;
+    private HttpServletRequest request;
 }
