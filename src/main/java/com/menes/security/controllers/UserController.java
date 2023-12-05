@@ -15,6 +15,10 @@ public class UserController {
     public ResponseEntity<?> getAllUsers(){
         return ResponseEntity.ok(service.getAllUsers());
     }
+    @GetMapping("/haha")
+    public ResponseEntity<?> hello(){
+        return ResponseEntity.ok("hello");
+    }
 
 
 }

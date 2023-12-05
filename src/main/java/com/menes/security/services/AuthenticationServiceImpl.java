@@ -11,6 +11,7 @@ import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,7 +29,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public AuthenticationResponse register(RegisterRequest request) {
         System.out.println("Im first");
 
-        if(userRepository.findUserByEmail(request.getEmail()).isPresent()){
+        if (userRepository.findUserByEmail(request.getEmail()).isPresent()) {
             throw new ApiRequestException("Email taken");
         }
 
@@ -39,7 +40,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
                 .build();
-            userRepository.save(user);
+        userRepository.save(user);
 
         String jwt = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
@@ -49,11 +50,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
-
-        User user = userRepository.findUserByEmail(request.getEmail()).orElseThrow(()-> new ApiRequestException("Email not found!"));
+        User user = userRepository.findUserByEmail(request.getEmail()).orElseThrow(() -> new ApiRequestException("Email not found!"));
+        // TODO authenticated failed 403 code
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(), request.getPassword()));
+        System.out.println(authentication);
+        if (!authentication.isAuthenticated()) {
+            throw new ApiRequestException("Password wrong!");
+        }
         String jwt = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
                 .token(jwt)
