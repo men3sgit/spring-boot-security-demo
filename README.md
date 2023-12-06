@@ -1,2 +1,2 @@
-# Spring Boot Security Demo
+# Spring Security 6
 back0end
